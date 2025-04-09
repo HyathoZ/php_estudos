@@ -1,15 +1,15 @@
 <?php
 include("conexao.php");
-
-// Inicia a sessão no começo
 session_start();
 
 // Verifica se os campos foram enviados
 if (!isset($_POST['cpf']) || empty($_POST['cpf'])) {
-    die("Insira um CPF.");
+    header("Location: index.php?erro=cpf");
+    exit;
 }
 if (!isset($_POST['senha']) || empty($_POST['senha'])) {
-    die("Insira uma senha.");
+    header("Location: index.php?erro=senha");
+    exit;
 }
 
 $cpf = $_POST["cpf"];
@@ -26,6 +26,7 @@ if ($row && !empty($row['nome'])) {
     header("Location: principal.php");
     exit;
 } else {
-    echo "Senha incorreta ou usuário não encontrado.";
+    header("Location: index.php?erro=login");
+    exit;
 }
 ?>

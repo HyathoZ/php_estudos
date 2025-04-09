@@ -1,17 +1,100 @@
-body {
-    font-family: Arial, sans-serif;
+/* Reset e padrão geral */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-}
-#conteudo {
-    background-color: rgb(182, 182, 182);
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-.sair {
-    background: red;
+body#conteudo {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Cabeçalho */
+header {
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header p {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+header .sair a {
     text-decoration: none;
-    border-radius: 3px;
-    padding: 8px 12px;
-    display: inline-block;
+    color: #fff;
+    background-color: #e74c3c;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+header .sair a:hover {
+    background-color: #c0392b;
+}
+
+/* Container principal (menu + conteúdo) */
+div {
+    display: flex;
+    padding: 20px;
+}
+
+/* Menu lateral clean e moderno */
+.menu {
+    width: 240px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-right: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.menu h2 {
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Itens do menu */
+.menu p {
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.menu p:hover {
+    background-color: #e6f0ff;
+    color: #1e90ff;
+    transform: translateX(5px);
+}
+
+/* Área de conteúdo (filmes) */
+.filmes {
+    flex: 1;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.filmes h2 {
+    color: #444;
+    font-size: 1.3em;
+    margin-bottom: 10px;
 }
