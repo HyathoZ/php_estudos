@@ -15,7 +15,7 @@ if (!isset($_SESSION['cpf'])) {
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-    <title>unifilmes</title>
+    <title>Unifilmes</title>
     
 </head>
 
