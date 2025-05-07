@@ -36,6 +36,9 @@ if (isset($_GET['erro'])) {
                 <input type="password" name="senha" placeholder="Senha" required>
                 <button type="submit">Entrar</button>
             </form>
+            <div class="cadastrar">
+                <a href="register.php" class="btn-cadastrar">Cadastrar novo usuário</a>
+            </div>
         </div>
     </div>
 </body>

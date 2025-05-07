@@ -29,4 +29,5 @@ if ($row && !empty($row['nome'])) {
     header("Location: index.php?erro=login");
     exit;
 }
-?>
+?> 
+<a href="register.php">Cadastrar novo usuário</a>
