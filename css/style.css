@@ -44,7 +44,15 @@ div {
     display: flex;
     padding: 20px;
 }
-
+footer {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
 /* Menu lateral clean e moderno */
 .menu {
     width: 240px;
@@ -97,4 +105,18 @@ div {
     color: #444;
     font-size: 1.3em;
     margin-bottom: 10px;
+}
+.filme-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.filme-item {
+    width: 200px;
+    background-color: #f4f4f4;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
