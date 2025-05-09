@@ -50,4 +50,70 @@ document.addEventListener('DOMContentLoaded', function () {
     // Torna as funções globais para serem usadas inline no HTML
     window.openEditModal = openEditModal;
     window.openCreateModal = openCreateModal;
+    // Torna a função de exclusão global
+    window.openConfirmDeleteModal = function(userId) {
+        document.getElementById('delete_id_modal').value = userId;
+        document.getElementById('confirmDeleteModal').classList.add('show');
+    };
+    // Fecha o modal ao clicar no X ou em cancelar
+    document.getElementById('closeConfirmDeleteModal').onclick = function() {
+        document.getElementById('confirmDeleteModal').classList.remove('show');
+    };
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        document.getElementById('confirmDeleteModal').classList.remove('show');
+    };
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('confirmDeleteModal');
+        if (event.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+
+    // Funções para o modal de filmes
+    window.openCreateMovieModal = function() {
+        document.getElementById('movie_id').value = '';
+        document.getElementById('movie_titulo').value = '';
+        document.getElementById('movie_diretor').value = '';
+        document.getElementById('movie_ano').value = '';
+        document.getElementById('movie_genero').value = '';
+        document.getElementById('movieModalTitle').textContent = 'Novo Filme';
+        document.getElementById('movieModalSubmitButton').textContent = 'Cadastrar Filme';
+        document.getElementById('movieModalSubmitButton').name = 'create_movie';
+        document.getElementById('movieModal').classList.add('show');
+    };
+    window.openEditMovieModal = function(filme) {
+        document.getElementById('movie_id').value = filme.id;
+        document.getElementById('movie_titulo').value = filme.titulo;
+        document.getElementById('movie_diretor').value = filme.diretor;
+        document.getElementById('movie_ano').value = filme.ano;
+        document.getElementById('movie_genero').value = filme.genero;
+        document.getElementById('movieModalTitle').textContent = 'Editar Filme';
+        document.getElementById('movieModalSubmitButton').textContent = 'Salvar Alterações';
+        document.getElementById('movieModalSubmitButton').name = 'update_movie';
+        document.getElementById('movieModal').classList.add('show');
+    };
+    document.getElementById('closeMovieModal').onclick = function() {
+        document.getElementById('movieModal').classList.remove('show');
+    };
+    // Modal de exclusão de filme
+    window.openConfirmDeleteMovieModal = function(id) {
+        document.getElementById('delete_movie_id_modal').value = id;
+        document.getElementById('confirmDeleteMovieModal').classList.add('show');
+    };
+    document.getElementById('closeConfirmDeleteMovieModal').onclick = function() {
+        document.getElementById('confirmDeleteMovieModal').classList.remove('show');
+    };
+    document.getElementById('cancelDeleteMovieBtn').onclick = function() {
+        document.getElementById('confirmDeleteMovieModal').classList.remove('show');
+    };
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('movieModal');
+        if (event.target === modal) {
+            modal.classList.remove('show');
+        }
+        const delModal = document.getElementById('confirmDeleteMovieModal');
+        if (event.target === delModal) {
+            delModal.classList.remove('show');
+        }
+    });
 });

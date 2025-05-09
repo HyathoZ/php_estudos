@@ -14,6 +14,16 @@ class TMDB {
         return $this->makeRequest($endpoint);
     }
 
+    public function getMovieDetails($movieId) {
+        $endpoint = $this->baseUrl . "/movie/{$movieId}?language=pt-BR";
+        return $this->makeRequest($endpoint);
+    }
+
+    public function getMovieVideos($movieId) {
+        $endpoint = $this->baseUrl . "/movie/{$movieId}/videos?language=pt-BR";
+        return $this->makeRequest($endpoint);
+    }
+
     private function makeRequest($url) {
         $headers = [
             "Authorization: Bearer " . $this->bearerToken,

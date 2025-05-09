@@ -60,6 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
         }
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    $id = intval($_POST['delete_id']);
+    $sql = "DELETE FROM usuarios WHERE id='$id'";
+    if ($conn->query($sql) === TRUE) {
+        $mensagemSucesso = "✅ Usuário excluído com sucesso!";
+    } else {
+        $mensagemErro = "Erro ao excluir usuário: " . $conn->error;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -68,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/modal.css">
     <title>Usuários</title>
 </head>
 <body>
@@ -79,7 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
                 <img src="../icones/config.svg" alt="Configurações" class="config-icon" id="config-icon">
                 <div class="dropdown" id="dropdown-menu">
                     <ul>
-                        <li><a href="#">Tema</a></li>
+                        <li><a href="./usuarios.php">Usuários</a></li>
+                        <li><a href="./movies.php">Filmes</a></li>
                         <li><a href="#">Ajuda</a></li>
                     </ul>
                 </div>
@@ -141,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
                             <td><?php echo $usuario['senha']; ?></td>
                             <td>
                                 <button class="btn-edit" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($usuario)); ?>)">Editar</button>
-                                <button class="btn-delete">Excluir</button>
+                                <button class="btn-delete" onclick="openConfirmDeleteModal(<?php echo $usuario['id']; ?>)">Excluir</button>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -164,11 +176,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
         document.getElementById('modalTitle').textContent = '';
         document.getElementById('modalMessage').textContent = '<?php echo $mensagemSucesso; ?>';
         document.getElementById('modalMessage').style.display = 'block';
-        setTimeout(() => {
+        // Ao fechar o modal, recarrega a página
+        const closeModal = document.getElementById('closeModal');
+        closeModal.onclick = function() {
             modal.classList.remove('show');
             document.getElementById('editForm').style.display = 'block';
             document.getElementById('modalMessage').style.display = 'none';
-        }, 2500);
+            location.reload();
+        };
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('show');
+                document.getElementById('editForm').style.display = 'block';
+                document.getElementById('modalMessage').style.display = 'none';
+                location.reload();
+            }
+        };
+    });
+</script>
+<?php endif; ?>
+
+<!-- Modal para mensagens de sucesso/erro -->
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeMessageModal">&times;</span>
+        <div id="messageModalText" style="font-size:24px;font-weight:bold;text-align:center;"></div>
+    </div>
+</div>
+
+<?php if (!empty($mensagemSucesso) && isset($_POST['delete_user'])): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const messageModal = document.getElementById('messageModal');
+        const messageModalText = document.getElementById('messageModalText');
+        messageModalText.textContent = '<?php echo $mensagemSucesso; ?>';
+        messageModal.classList.add('show');
+        setTimeout(() => {
+            messageModal.classList.remove('show');
+            window.location.href = 'usuarios.php';
+        }, 2000);
     });
 </script>
 <?php endif; ?>
@@ -194,6 +240,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
     </div>
 </div>
 
+<!-- Modal de confirmação de exclusão -->
+<div id="confirmDeleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeConfirmDeleteModal">&times;</span>
+        <h3>Confirmar Exclusão</h3>
+        <p>Tem certeza que deseja excluir este usuário?</p>
+        <form id="deleteUserForm" method="post" action="usuarios.php">
+            <input type="hidden" name="delete_id" id="delete_id_modal">
+            <button type="submit" name="delete_user" class="btn-delete">Excluir</button>
+            <button type="button" id="cancelDeleteBtn">Cancelar</button>
+        </form>
+    </div>
+</div>
+
 <style>
 @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.8); }
@@ -206,82 +266,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
 </footer>
 <script src="../scripts/dropdown.js"></script>
 <script src="../scripts/openEditModal.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('editModal');
-        const closeModal = document.getElementById('closeModal');
-        const modalMessage = document.getElementById('modalMessage');
-        const editForm = document.getElementById('editForm');
-
-        closeModal.addEventListener('click', function () {
-            modal.classList.remove('show');
-        });
-
-        window.addEventListener('click', function (event) {
-            if (event.target === modal) {
-                modal.classList.remove('show');
-            }
-        });
-
-        editForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Impede o envio padrão do formulário
-
-            // Simula o envio do formulário e exibe a mensagem
-            const formData = new FormData(editForm);
-            fetch('usuarios.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                // Exibe a mensagem de sucesso ou erro
-                if (data.includes('✅')) {
-                    modalMessage.style.color = 'green';
-                    modalMessage.textContent = '✅ Usuário atualizado com sucesso!';
-                } else {
-                    modalMessage.style.color = 'red';
-                    modalMessage.textContent = '⚠️ CPF ou email já estão cadastrados.';
-                }
-
-                modalMessage.style.display = 'block';
-                editForm.style.display = 'none';
-
-                // Fecha o modal após 3 segundos
-                setTimeout(() => {
-                    modal.classList.remove('show');
-                    modalMessage.style.display = 'none';
-                    editForm.style.display = 'block';
-                }, 3000);
-            })
-            .catch(error => {
-                modalMessage.style.color = 'red';
-                modalMessage.textContent = '❌ Ocorreu um erro ao atualizar o usuário.';
-                modalMessage.style.display = 'block';
-
-                // Fecha o modal após 3 segundos
-                setTimeout(() => {
-                    modal.classList.remove('show');
-                    modalMessage.style.display = 'none';
-                    editForm.style.display = 'block';
-                }, 3000);
-            });
-        });
-
-        // Mantém o modal aberto se houver mensagens de erro ou sucesso
-        <?php if (!empty($mensagemErro) || !empty($mensagemSucesso)): ?>
-            const modalMessageContent = "<?php echo !empty($mensagemErro) ? $mensagemErro : $mensagemSucesso; ?>";
-            modalMessage.textContent = modalMessageContent;
-            modalMessage.style.color = "<?php echo !empty($mensagemErro) ? 'red' : 'green'; ?>";
-            modalMessage.style.display = 'block';
-            editForm.style.display = 'none';
-
-            setTimeout(() => {
-                modal.classList.remove('show');
-                modalMessage.style.display = 'none';
-                editForm.style.display = 'block';
-            }, 3000);
-        <?php endif; ?>
-    });
-</script>
 </body>
 </html>

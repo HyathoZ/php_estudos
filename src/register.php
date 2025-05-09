@@ -6,21 +6,22 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = $_POST["nome"];
     $cpf = $_POST["cpf"];
+    $email = $_POST["email"];
     $senha = $_POST["senha"];
 
     // Verifica se os campos estão preenchidos
-    if (empty($nome) || empty($cpf) || empty($senha)) {
+    if (empty($nome) || empty($cpf) || empty($email) || empty($senha)) {
         $mensagemErro = "Todos os campos são obrigatórios.";
     } else {
-        // Verifica se o CPF já está cadastrado
-        $sqlVerifica = "SELECT cpf FROM usuarios WHERE cpf = '$cpf'";
+        // Verifica se o CPF ou email já está cadastrado
+        $sqlVerifica = "SELECT cpf FROM usuarios WHERE cpf = '$cpf' OR email = '$email'";
         $resultado = $conn->query($sqlVerifica);
 
         if ($resultado->num_rows > 0) {
-            $mensagemErro = "⚠️ Este CPF já está cadastrado.";
+            $mensagemErro = "⚠️ Este CPF ou email já está cadastrado.";
         } else {
             // Insere os dados no banco de dados
-            $sql = "INSERT INTO usuarios (nome, cpf, senha) VALUES ('$nome', '$cpf', '$senha')";
+            $sql = "INSERT INTO usuarios (nome, cpf, email, senha) VALUES ('$nome', '$cpf', '$email', '$senha')";
             if ($conn->query($sql) === TRUE) {
                 $mensagemSucesso = "✅ Usuário cadastrado com sucesso!";
             } else {
@@ -54,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form method="post" action="register.php">
                 <input type="text" name="nome" placeholder="Nome" required>
                 <input type="text" name="cpf" placeholder="CPF" required>
+                <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="senha" placeholder="Senha" required>
                 <button type="submit">Cadastrar-se</button>
             </form>
