@@ -23,6 +23,7 @@ if (isset($_GET['erro'])) {
     <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
+    
     <div class="container">
         <div class="login-box">
             <h2>Login</h2>
@@ -36,6 +37,9 @@ if (isset($_GET['erro'])) {
                 <input type="password" name="senha" placeholder="Senha" required>
                 <button type="submit">Entrar</button>
             </form>
+            <div class="cadastrar">
+                <a href="register.php" class="btn-cadastrar">Cadastrar novo usuário</a>
+            </div>
         </div>
     </div>
 </body>

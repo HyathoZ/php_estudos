@@ -1,3 +1,4 @@
+-- filepath: c:\xampp\htdocs\php_estudos\database\usuarios.sql
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
@@ -10,7 +11,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,17 +28,23 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(25) NOT NULL,
   `cpf` varchar(15) NOT NULL,
-  `senha` varchar(25) NOT NULL
+  `email` varchar(100) DEFAULT NULL,
+  `senha` varchar(25) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cpf` (`cpf`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `usuarios`
 --
 
-INSERT INTO `usuarios` (`nome`, `cpf`, `senha`) VALUES
-('123', '123', '123');
+INSERT INTO `usuarios` (`nome`, `cpf`, `email`, `senha`) VALUES
+('123', '123', 'teste@teste.com', '123');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
