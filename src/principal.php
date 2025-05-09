@@ -17,6 +17,7 @@ $popularMovies = $tmdb->getPopularMovies();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/modal.css">
     <title>Unifilmes</title>
 </head>
 <body>
@@ -29,7 +30,7 @@ $popularMovies = $tmdb->getPopularMovies();
                 <div class="dropdown" id="dropdown-menu">
                     <ul>
                         <li><a href="./usuarios.php">Usuarios</a></li>
-                        <li><a href="#">Tema</a></li>
+                        <li><a href="./movies.php">Filmes</a></li>
                         <li><a href="#">Ajuda</a></li>
                     </ul>
                 </div>
@@ -40,18 +41,45 @@ $popularMovies = $tmdb->getPopularMovies();
 </header>
 
 <main class="container">
-    <aside class="menu">
-        <h3>Filmes Populares</h3>
-        <ul>
-            <?php foreach ($popularMovies['results'] as $movie): ?>
-                <li><?php echo $movie['title']; ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </aside>
-
-    <section class="filmes">
-        <h3>Detalhes do Filme</h3>
-        <p>Selecione um filme para ver mais detalhes.</p>
+    <section class="filmes filmes-destaque">
+        <form method="GET" class="search-bar" style="margin-bottom: 24px;">
+            <input type="text" name="q" placeholder="Pesquisar" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>" required>
+            <button type="submit" class="btn-search">Pesquisar</button>
+            <?php if (isset($_GET['q'])): ?>
+                <a href="principal.php" class="btn-clear" style="margin-left:10px;">Limpar</a>
+            <?php endif; ?>
+        </form>
+        <h3>Filmes em Destaque</h3>
+        <?php
+        $filmesParaExibir = $popularMovies;
+        if (isset($_GET['q']) && trim($_GET['q']) !== '') {
+            $busca = trim($_GET['q']);
+            $filmesParaExibir = $tmdb->searchMovie($busca);
+            echo '<h4>Resultados para: ' . htmlspecialchars($busca) . '</h4>';
+        }
+        ?>
+        <div class="filmes-grid">
+            <?php if (!empty($filmesParaExibir['results'])): ?>
+                <?php foreach ($filmesParaExibir['results'] as $movie): ?>
+                    <a href="description.php?id=<?php echo $movie['id']; ?>" class="filme-link">
+                        <div class="filme-card">
+                            <?php if ($movie['poster_path']): ?>
+                                <img src="https://image.tmdb.org/t/p/w300<?php echo $movie['poster_path']; ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>" class="filme-poster">
+                            <?php else: ?>
+                                <div class="filme-sem-poster">Sem imagem</div>
+                            <?php endif; ?>
+                            <div class="filme-info">
+                                <h4><?php echo htmlspecialchars($movie['title']); ?></h4>
+                                <p class="filme-data">Lançamento: <?php echo $movie['release_date']; ?></p>
+                                <p class="filme-voto">Nota: <?php echo $movie['vote_average']; ?>/10</p>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p style="grid-column: 1/-1; text-align:center;">Nenhum filme encontrado.</p>
+            <?php endif; ?>
+        </div>
     </section>
 </main>
 

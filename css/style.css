@@ -40,8 +40,8 @@ header h2 {
 }
 
 .config-icon {
-    width: 24px;
-    height: 24px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
@@ -108,6 +108,7 @@ header h2 {
 }
 
 .menu {
+    display: none;
     width: 25%;
     background: #007bff; /* Azul */
     color: #ffffff; /* Branco */
@@ -153,6 +154,95 @@ header h2 {
     margin-top: 0;
     color: #007bff; /* Azul */
     font-size: 18px;
+}
+
+.filmes-destaque {
+    width: 100%;
+}
+
+.filmes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas fixas */
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.filme-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
+
+.filme-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.filme-link:hover .filme-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 123, 255, 0.18);
+    z-index: 1;
+    border-radius: 10px;
+    pointer-events: none;
+    transition: background 0.2s;
+}
+
+.filme-link:hover .filme-card {
+    transform: scale(1.04);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.filme-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.filme-poster {
+    width: 100%;
+    max-width: 160px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.filme-sem-poster {
+    width: 160px;
+    height: 240px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.filme-info {
+    text-align: center;
+}
+
+.filme-info h4 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    color: #007bff;
+}
+
+.filme-data, .filme-voto {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
 }
 
 .usuarios {
@@ -270,96 +360,4 @@ footer {
     margin-top: auto;
     width: 100%;
     position: relative;
-}
-
-/* Adicionando animação ao modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Escurece a tela */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0; /* Inicialmente invisível */
-    visibility: hidden; /* Esconde o modal */
-    transition: opacity 0.3s ease, visibility 0.3s ease; /* Animação de transição */
-}
-
-.modal.show {
-    opacity: 1; /* Torna visível */
-    visibility: visible; /* Mostra o modal */
-}
-
-.modal-content {
-    background-color: #ffffff; /* Fundo branco */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    max-width: 90%;
-    text-align: center;
-    transform: scale(0.8); /* Inicialmente menor */
-    transition: transform 0.3s ease; /* Animação de crescimento */
-}
-
-.modal.show .modal-content {
-    transform: scale(1); /* Cresce para o tamanho normal */
-}
-
-/* Ajustando os campos do modal para alinhamento correto */
-.modal-content input {
-    width: calc(100% - 20px); /* Ajusta a largura para evitar overflow */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    box-sizing: border-box; /* Garante que padding e borda sejam incluídos na largura total */
-}
-
-.modal-content label {
-    display: block;
-    margin: 10px 0 5px;
-    text-align: left;
-    color: #333;
-    font-weight: bold;
-}
-
-.modal-content h3 {
-    margin-bottom: 20px;
-    color: #007bff; /* Azul */
-}
-
-.modal-content button {
-    padding: 10px 20px;
-    background-color: #007bff; /* Azul */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.modal-content button:hover {
-    background-color: #0056b3; /* Azul mais escuro */
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: #ff4d4d; /* Vermelho */
 }
