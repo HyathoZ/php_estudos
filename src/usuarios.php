@@ -70,6 +70,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
         $mensagemErro = "Erro ao excluir usuário: " . $conn->error;
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['create_user']) || isset($_POST['update_user']))) {
+    $nome = $conn->real_escape_string($_POST['edit_nome']);
+    $cpf = $conn->real_escape_string($_POST['edit_cpf']);
+    $email = $conn->real_escape_string($_POST['edit_email']);
+    $senha = $conn->real_escape_string($_POST['edit_senha']);
+
+    // Validação de CPF
+    function validar_cpf($cpf) {
+        $cpf = preg_replace('/[^0-9]/', '', $cpf);
+        if (strlen($cpf) != 11 || preg_match('/^(\d)\1{10}$/', $cpf)) return false;
+        for ($t = 9; $t < 11; $t++) {
+            for ($d = 0, $c = 0; $c < $t; $c++) {
+                $d += $cpf[$c] * (($t + 1) - $c);
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cpf[$c] != $d) return false;
+        }
+        return true;
+    }
+    if (!validar_cpf($cpf)) {
+        $mensagemErro = '⚠️ CPF inválido.';
+    }
+
+    // Validação de senha
+    if (empty($mensagemErro)) {
+        $senhaValida = preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/', $senha);
+        if (!$senhaValida) {
+            $mensagemErro = '⚠️ A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -230,11 +262,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
             <label for="edit_nome">Nome:</label>
             <input type="text" name="edit_nome" id="edit_nome" required>
             <label for="edit_cpf">CPF:</label>
-            <input type="text" name="edit_cpf" id="edit_cpf" required>
+            <input type="text" name="edit_cpf" id="edit_cpf" required maxlength="14">
             <label for="edit_email">Email:</label>
             <input type="email" name="edit_email" id="edit_email" required>
             <label for="edit_senha">Senha:</label>
-            <input type="password" name="edit_senha" id="edit_senha" required>
+            <input type="password" name="edit_senha" id="edit_senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{6,}$" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial">
+            <span id="senhaHelp" style="color:#d00;font-size:13px;display:none;"></span>
             <button type="submit" id="modalSubmitButton" name="update_user">Salvar Alterações</button>
         </form>
     </div>
@@ -266,5 +299,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 </footer>
 <script src="../scripts/dropdown.js"></script>
 <script src="../scripts/openEditModal.js"></script>
+<script>
+// Validação de senha forte no frontend
+const senhaInput = document.getElementById('edit_senha');
+const senhaHelp = document.getElementById('senhaHelp');
+if (senhaInput && senhaHelp) {
+    senhaInput.addEventListener('input', function() {
+        const val = senhaInput.value;
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/;
+        if (!regex.test(val)) {
+            senhaHelp.style.display = 'block';
+            senhaHelp.textContent = 'A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
+        } else {
+            senhaHelp.style.display = 'none';
+        }
+    });
+}
+
+// Máscara e validação básica de CPF
+const cpfInput = document.getElementById('edit_cpf');
+if (cpfInput) {
+    cpfInput.addEventListener('input', function(e) {
+        let v = cpfInput.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0,11);
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+        v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        cpfInput.value = v;
+    });
+}
+</script>
 </body>
 </html>
