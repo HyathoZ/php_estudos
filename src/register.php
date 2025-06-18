@@ -81,7 +81,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="text" name="nome" placeholder="Nome" required>
                 <input type="text" name="cpf" placeholder="CPF" required maxlength="14" id="cpf">
                 <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="senha" placeholder="Senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{6,}$" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial" id="senha">
+                <div class="senha-container">
+                    <input type="password" name="senha" placeholder="Senha" required minlength="6" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial" id="senha">
+                    <button type="button" id="toggleSenha" class="toggle-senha">👁️</button>
+                </div>
                 <span id="senhaHelp" style="color:#d00;font-size:13px;display:none;"></span>
                 <button type="submit">Cadastrar-se</button>
             </form>
@@ -105,15 +108,38 @@ if (cpfInput) {
 // Validação de senha forte
 const senhaInput = document.getElementById('senha');
 const senhaHelp = document.getElementById('senhaHelp');
-if (senhaInput && senhaHelp) {
-    senhaInput.addEventListener('input', function() {
+const form = document.querySelector('form');
+if (senhaInput && senhaHelp && form) {
+    function validarSenha() {
         const val = senhaInput.value;
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/;
         if (!regex.test(val)) {
             senhaHelp.style.display = 'block';
             senhaHelp.textContent = 'A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
+            return false;
         } else {
             senhaHelp.style.display = 'none';
+            return true;
+        }
+    }
+    senhaInput.addEventListener('input', validarSenha);
+    form.addEventListener('submit', function(e) {
+        if (!validarSenha()) {
+            senhaInput.focus();
+            e.preventDefault();
+        }
+    });
+}
+// Visualizar senha
+const toggleSenha = document.getElementById('toggleSenha');
+if (toggleSenha && senhaInput) {
+    toggleSenha.addEventListener('click', function() {
+        if (senhaInput.type === 'password') {
+            senhaInput.type = 'text';
+            toggleSenha.textContent = '🙈';
+        } else {
+            senhaInput.type = 'password';
+            toggleSenha.textContent = '👁️';
         }
     });
 }

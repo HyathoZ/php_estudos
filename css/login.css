@@ -55,6 +55,53 @@ body {
     text-align: center; /* Centraliza o texto dentro dos campos */
 }
 
+.senha-container {
+    display: flex;
+    width: 90%;
+    margin: 10px auto;
+    align-items: stretch;
+}
+
+.senha-container input[type="password"],
+.senha-container input[type="text"] {
+    flex: 1 1 0;
+    padding: 12px;
+    border: 1px solid #007bff;
+    border-radius: 5px 0 0 5px;
+    margin: 0;
+    height: auto;
+    text-align: center;
+    background: #f9f9f9;
+    color: #222;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.toggle-senha {
+    flex: 0 0 10%;
+    position: static;
+    height: auto;
+    min-width: 44px;
+    border-radius: 0 1px 1px 0;
+    margin: 0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9f9f9;
+    border: 1px solid #007bff;
+    border-left: none;
+    color: #7a8599;
+    font-size: 18px;
+    z-index: 2;
+    transition: none;
+    cursor: pointer;
+}
+
+.toggle-senha:hover {
+    background: #e6e6e6;
+}
+
 .login-box button {
     width: 90%; /* Ajusta a largura do botão */
     padding: 12px;
