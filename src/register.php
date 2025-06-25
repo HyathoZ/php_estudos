@@ -20,28 +20,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($resultado->num_rows > 0) {
             $mensagemErro = "⚠️ Este CPF ou email já está cadastrado.";
         } else {
-            // Validação de CPF
+            // Validação de CPF (backend)
             function validar_cpf($cpf) {
                 $cpf = preg_replace('/[^0-9]/', '', $cpf);
                 if (strlen($cpf) != 11 || preg_match('/^(\d)\1{10}$/', $cpf)) return false;
                 for ($t = 9; $t < 11; $t++) {
-                    for ($d = 0, $c = 0; $c < $t; $c++) {
+                    $d = 0;
+                    for ($c = 0; $c < $t; $c++) {
                         $d += $cpf[$c] * (($t + 1) - $c);
                     }
                     $d = ((10 * $d) % 11) % 10;
-                    if ($cpf[$c] != $d) return false;
+                    if ($cpf[$t] != $d) return false;
                 }
                 return true;
             }
+            // Validação de senha forte (backend)
+            function validar_senha($senha) {
+                // Corrigido: Aceita qualquer caractere especial, mínimo 6, pelo menos 1 maiúscula, 1 minúscula, 1 número e 1 especial
+                return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/u', $senha);
+            }
+            // Validação de CPF e senha forte ao cadastrar
             if (!validar_cpf($cpf)) {
                 $mensagemErro = '⚠️ CPF inválido.';
-            }
-            // Validação de senha forte
-            if (empty($mensagemErro)) {
-                $senhaValida = preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/', $senha);
-                if (!$senhaValida) {
-                    $mensagemErro = '⚠️ A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
-                }
+            } elseif (empty($mensagemErro) && !validar_senha($senha)) {
+                $mensagemErro = '⚠️ A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
             }
             // Insere os dados no banco de dados
             if (empty($mensagemErro)) {
@@ -81,8 +83,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="text" name="nome" placeholder="Nome" required>
                 <input type="text" name="cpf" placeholder="CPF" required maxlength="14" id="cpf">
                 <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="senha" placeholder="Senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{6,}$" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial" id="senha">
                 <span id="senhaHelp" style="color:#d00;font-size:13px;display:none;"></span>
+                <input type="password" name="senha" id="senha" placeholder="Senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-=\[\]{};':&quot;\\|,.<>\/?]).{6,}$" title="A senha deve ter no mínimo 6 caracteres, incluindo 1 letra maiúscula, 1 letra minúscula, 1 número e 1 caractere especial.">
+
                 <button type="submit">Cadastrar-se</button>
             </form>
             <p class="cadastrar">Já tem uma conta? <a href="index.php">Faça login</a></p>

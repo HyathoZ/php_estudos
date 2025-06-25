@@ -77,29 +77,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['create_user']) || is
     $email = $conn->real_escape_string($_POST['edit_email']);
     $senha = $conn->real_escape_string($_POST['edit_senha']);
 
-    // Validação de CPF
+    // Validação de CPF (backend)
     function validar_cpf($cpf) {
         $cpf = preg_replace('/[^0-9]/', '', $cpf);
         if (strlen($cpf) != 11 || preg_match('/^(\d)\1{10}$/', $cpf)) return false;
         for ($t = 9; $t < 11; $t++) {
-            for ($d = 0, $c = 0; $c < $t; $c++) {
+            $d = 0;
+            for ($c = 0; $c < $t; $c++) {
                 $d += $cpf[$c] * (($t + 1) - $c);
             }
             $d = ((10 * $d) % 11) % 10;
-            if ($cpf[$c] != $d) return false;
+            if ($cpf[$t] != $d) return false;
         }
         return true;
     }
-    if (!validar_cpf($cpf)) {
-        $mensagemErro = '⚠️ CPF inválido.';
+
+    // Validação de senha forte (backend)
+    function validar_senha($senha) {
+        // Corrigido: Aceita qualquer caractere especial, mínimo 6, pelo menos 1 maiúscula, 1 minúscula, 1 número e 1 especial
+        return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/u', $senha);
     }
 
-    // Validação de senha
-    if (empty($mensagemErro)) {
-        $senhaValida = preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/', $senha);
-        if (!$senhaValida) {
-            $mensagemErro = '⚠️ A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
-        }
+    // Validação de CPF e senha forte ao editar usuário
+    if (!validar_cpf($cpf)) {
+        $mensagemErro = '⚠️ CPF inválido.';
+    } elseif (empty($mensagemErro) && !validar_senha($senha)) {
+        $mensagemErro = '⚠️ A senha deve ter no mínimo 6 caracteres, incluindo uma maiúscula, uma minúscula, um número e um caractere especial.';
     }
 }
 ?>
@@ -266,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['create_user']) || is
             <label for="edit_email">Email:</label>
             <input type="email" name="edit_email" id="edit_email" required>
             <label for="edit_senha">Senha:</label>
-            <input type="password" name="edit_senha" id="edit_senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{6,}$" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial">
+            <input type="password" name="edit_senha" id="edit_senha" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$" title="Mínimo 6 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 especial">
             <span id="senhaHelp" style="color:#d00;font-size:13px;display:none;"></span>
             <button type="submit" id="modalSubmitButton" name="update_user">Salvar Alterações</button>
         </form>
