@@ -199,15 +199,11 @@ if (isset($_GET['imdb_search'])) {
                     <td><?= htmlspecialchars($filme['actors']) ?></td>
                     <td><?= isset($filme['avaliacao']) ? htmlspecialchars($filme['avaliacao']) : 'N/A' ?></td>
                     <td>
-                        <form method="post" action="movies.php" style="display:inline;">
-                            <input type="hidden" name="toggle_id" value="<?= htmlspecialchars($filme['id']) ?>">
-                            <input type="hidden" name="toggle_ativo" value="<?= $filme['ativoNaHome'] ? 0 : 1 ?>">
-                            <button type="submit" name="toggle_ativo" style="background:none;border:none;cursor:pointer;">
-                                <span style="display:inline-block;width:40px;height:24px;background:<?= $filme['ativoNaHome'] ? '#28a745' : '#ccc' ?>;border-radius:12px;position:relative;vertical-align:middle;transition:background 0.2s;">
-                                    <span style="position:absolute;left:<?= $filme['ativoNaHome'] ? '20px' : '2px' ?>;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
-                                </span>
-                            </button>
-                        </form>
+                        <label class="switch">
+                            <input type="checkbox" class="toggle-switch" data-id="<?= htmlspecialchars($filme['imdbID']) ?>" <?= $filme['exibirNaHome'] ? 'checked' : '' ?> onchange="atualizarExibirNaHome(this)">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="margin-left:8px;">Ativo na Home</span>
                     </td>
                     <td>
                         <button class="btn-edit" onclick='openEditMovieModal(<?= json_encode($filme) ?>)'>Editar</button>
@@ -271,7 +267,24 @@ if (isset($_GET['imdb_search'])) {
 </div>
 <script src="../scripts/dropdown.js"></script>
 <script src="../scripts/openEditModal.js"></script>
+<script src="../scripts/atualizar_home.js"></script>
 <script>
+function toggleExibirNaHome(imdbID, checked) {
+    fetch('atualizar_home.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imdbID: imdbID, exibirNaHome: checked ? 1 : 0 })
+    })
+    .then(r => r.json())
+    .then data => {
+        if (!data.success) {
+            alert('Erro ao atualizar destaque: ' + (data.message || 'Erro desconhecido.'));
+        } else {
+            console.log('Atualizado!');
+        }
+    })
+    .catch(() => alert('Erro de comunicação com o servidor.'));
+}
 // Função para abrir o modal de busca
 function openImdbSearchModal() {
     var imdbModal = document.getElementById('imdbSearchModal');
@@ -305,7 +318,7 @@ function searchImdbMovie() {
     }
     resultsDiv.innerHTML = '<div style="color:#007bff;text-align:center;padding:20px;">Carregando...</div>';
     fetch('movies.php?imdb_search=' + encodeURIComponent(query))
-        .then(r => r.json())
+        .then r => r.json())
         .then(data => {
             console.log('Resposta da API:', data);
             let html = '';
@@ -362,6 +375,40 @@ if (document.getElementById('pesquisar')) {
     };
 }
 </script>
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch input {display:none;}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #28a745;
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+</style>
 <footer>
     <p>&copy; 2025 Unifilmes. Todos os direitos reservados.</p>
 </footer>
