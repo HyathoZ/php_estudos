@@ -193,11 +193,11 @@ if (isset($_GET['imdb_search'])) {
             <tbody>
                 <?php while ($filme = $filmes->fetch_assoc()): ?>
                 <tr>
-                    <td><?php if ($filme['imagem']): ?><img src="<?php echo htmlspecialchars($filme['imagem']); ?>" alt="Poster" style="width:60px;max-height:90px;object-fit:cover;"/><?php endif; ?></td>
-                    <td><?= htmlspecialchars($filme['titulo']) ?></td>
-                    <td style="max-width:200px;white-space:pre-line;overflow:auto;"> <?= htmlspecialchars($filme['descricao']) ?> </td>
-                    <td><?= htmlspecialchars($filme['elenco']) ?></td>
-                    <td><?= htmlspecialchars($filme['avaliacao']) ?></td>
+                    <td><?php if (!empty($filme['poster'])): ?><img src="<?php echo htmlspecialchars($filme['poster']); ?>" alt="Poster" style="width:60px;max-height:90px;object-fit:cover;"/><?php endif; ?></td>
+                    <td><?= htmlspecialchars($filme['title']) ?></td>
+                    <td style="max-width:200px;white-space:pre-line;overflow:auto;"> <?= htmlspecialchars($filme['plot']) ?> </td>
+                    <td><?= htmlspecialchars($filme['actors']) ?></td>
+                    <td><?= isset($filme['avaliacao']) ? htmlspecialchars($filme['avaliacao']) : 'N/A' ?></td>
                     <td>
                         <form method="post" action="movies.php" style="display:inline;">
                             <input type="hidden" name="toggle_id" value="<?= htmlspecialchars($filme['id']) ?>">
