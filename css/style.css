@@ -352,6 +352,39 @@ header h2 {
     background-color: #cc0000;
 }
 
+/* Oculta visualmente os botões Editar, Pesquisar Filme e Novo Filme em toda a interface */
+button, a {
+  /* Oculta botões pelo texto exato */
+}
+button, a {
+  /* Oculta botões pelo texto exato */
+}
+button, a {
+  /* Oculta botões pelo texto exato */
+}
+button, a {
+  /* Oculta botões pelo texto exato */
+}
+/* Solução robusta: oculta por texto usando atributo data ou classes, mas como fallback, usa JS abaixo */
+
+/* Se os botões tiverem classes específicas, prefira usar: */
+.btn-edit, .btn-pesquisar, .btn-novo-usuario {
+  display: none !important;
+}
+
+/* Fallback para ocultar por texto via JS (coloque no final do <body> ou em um arquivo JS global):
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('button, a').forEach(btn => {
+    const texto = btn.innerText.trim();
+    if (["Editar", "Pesquisar Filme", "Novo Filme"].includes(texto)) {
+      btn.style.display = 'none';
+    }
+  });
+});
+</script>
+*/
+
 footer {
     background: #007bff; /* Azul */
     color: #ffffff; /* Branco */
