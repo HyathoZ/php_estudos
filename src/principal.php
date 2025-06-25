@@ -9,7 +9,7 @@ if (!isset($_SESSION['cpf'])) {
 
 $tmdb = new TMDB();
 $popularMovies = $tmdb->getPopularMovies();
-
+ 
 // Exibe apenas filmes ativos na home
 include('conexao.php');
 $filmesAtivos = $conn->query("SELECT * FROM filmes WHERE ativoNaHome = 1");
@@ -82,9 +82,38 @@ $filmesAtivos = $conn->query("SELECT * FROM filmes WHERE ativoNaHome = 1");
     </section>
 </main>
 
+<div style="margin: 20px; text-align: right;">
+    <button class="btn-novo-usuario" id="botaoPesquisar" style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-right: 10px;">
+        Pesquisar Filme
+    </button>
+</div>
+
+<!-- Modal de pesquisa de filmes -->
+<div id="modalPesquisa" class="modal">
+    <div class="modal-content" style="max-width:600px;min-width:350px;position:relative;">
+        <span class="close" id="fecharModalPesquisa" tabindex="0" aria-label="Fechar modal">&times;</span>
+        <h3 style="color:#007bff;font-weight:600;">Pesquisar Filme</h3>
+        <form id="formPesquisaFilme" onsubmit="return false;" style="display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:16px;">
+            <input type="text" id="inputPesquisaFilme" placeholder="Digite o título do filme" style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid #b0b8c1;font-size:16px;background:#f7fafd;">
+            <button type="button" id="btnBuscarFilme" style="background:#007bff;color:#fff;padding:10px 18px;border:none;border-radius:6px;font-weight:600;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;gap:6px;">Buscar título</button>
+        </form>
+        <div id="resultadosPesquisaFilme" style="max-height:350px;overflow-y:auto;"></div>
+    </div>
+</div>
+
 <footer>
     <p>&copy; 2025 Unifilmes. Todos os direitos reservados.</p>
 </footer>
 <script src="../scripts/dropdown.js"></script>
+<script src="../scripts/openEditModal.js"></script>
+<script src="../scripts/pesquisaFilmeModal.js"></script>
 </body>
 </html>

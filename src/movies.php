@@ -67,15 +67,48 @@ if (isset($_GET['search'])) {
 }
 // Endpoint para busca na OMDb API (IMDb)
 if (isset($_GET['imdb_search'])) {
-    $apikey = 'demo'; // Troque por sua chave OMDb real
-    $query = urlencode($_GET['imdb_search']);
+    $apikey = '79a177ce'; // Chave OMDb real
+    $searchTerm = isset($_GET['imdb_search']) ? trim($_GET['imdb_search']) : '';
+    if (strlen($searchTerm) < 3) {
+        echo json_encode([
+            'Search' => [],
+            'Response' => 'False',
+            'Error' => 'Termo muito curto. Digite pelo menos 3 caracteres.'
+        ]);
+        exit;
+    }
     $byId = isset($_GET['by_id']) && $_GET['by_id'] == '1';
     $url = $byId
-        ? "http://www.omdbapi.com/?apikey=$apikey&i=$query&plot=full&r=json"
-        : "http://www.omdbapi.com/?apikey=$apikey&s=$query&type=movie&r=json";
-    $result = file_get_contents($url);
-    header('Content-Type: application/json');
-    echo $result;
+        ? "http://www.omdbapi.com/?apikey=$apikey&i=" . urlencode($searchTerm) . "&plot=full&r=json"
+        : "http://www.omdbapi.com/?apikey=$apikey&s=" . urlencode($searchTerm) . "&type=movie&r=json";
+    $result = @file_get_contents($url);
+    if ($result === false) {
+        echo json_encode([
+            'Search' => [],
+            'Response' => 'False',
+            'Error' => 'Erro ao consultar a API externa.',
+            'url' => $url
+        ]);
+        exit;
+    }
+    $data = json_decode($result, true);
+    // Trata erro Too many results
+    if (!$byId && isset($data['Error']) && strpos($data['Error'], 'Too many results') !== false) {
+        echo json_encode([
+            'Search' => [],
+            'Response' => 'False',
+            'Error' => 'Muitos resultados. Seja mais específico na busca.'
+        ]);
+        exit;
+    }
+    // Normaliza a resposta para sempre ter Search como array
+    if (!$byId) {
+        if (!isset($data['Search']) || !is_array($data['Search'])) {
+            $data['Search'] = [];
+        }
+        $data['Response'] = (count($data['Search']) > 0) ? 'True' : 'False';
+    }
+    echo json_encode($data);
     exit;
 }
 ?>
@@ -239,47 +272,56 @@ if (isset($_GET['imdb_search'])) {
 <script src="../scripts/dropdown.js"></script>
 <script src="../scripts/openEditModal.js"></script>
 <script>
+// Função para abrir o modal de busca
 function openImdbSearchModal() {
-    document.getElementById('imdbSearchModal').classList.add('show');
+    var imdbModal = document.getElementById('imdbSearchModal');
+    if (imdbModal) imdbModal.classList.add('show');
 }
-document.getElementById('closeImdbSearchModal').onclick = function() {
-    document.getElementById('imdbSearchModal').classList.remove('show');
-};
-
+// Função para fechar o modal de busca
+function closeImdbSearchModal() {
+    var imdbModal = document.getElementById('imdbSearchModal');
+    if (imdbModal) imdbModal.classList.remove('show');
+}
+// Garante que o botão de fechar está funcional
+if (document.getElementById('closeImdbSearchModal')) {
+    document.getElementById('closeImdbSearchModal').onclick = closeImdbSearchModal;
+}
+// Fecha o modal ao clicar fora do conteúdo
+window.addEventListener('click', function(event) {
+    var imdbModal = document.getElementById('imdbSearchModal');
+    if (imdbModal && event.target === imdbModal) {
+        imdbModal.classList.remove('show');
+    }
+});
+// Função de busca de filmes
 function searchImdbMovie() {
-    const query = document.getElementById('imdbQuery').value.trim();
+    const queryInput = document.getElementById('imdbQuery');
     const resultsDiv = document.getElementById('imdbResults');
-    const imdbModal = document.getElementById('imdbSearchModal');
-    if (!query || query.length < 3) {
-        resultsDiv.innerHTML = '<p style="color:#d00;text-align:center;">Digite pelo menos 3 caracteres para buscar.</p>';
-        imdbModal.classList.add('show');
+    if (!queryInput || !resultsDiv) return;
+    const query = queryInput.value.trim();
+    if (query.length < 2) {
+        resultsDiv.innerHTML = '<p style="color:#d00;text-align:center;">Digite pelo menos 2 caracteres.</p>';
         return;
     }
     resultsDiv.innerHTML = '<div style="color:#007bff;text-align:center;padding:20px;">Carregando...</div>';
-    imdbModal.classList.add('show');
     fetch('movies.php?imdb_search=' + encodeURIComponent(query))
-        .then(async r => {
-            if (!r.ok) throw new Error('Erro HTTP: ' + r.status);
-            const data = await r.json();
-            console.log('Resposta da API:', data); // Debug
-            return data;
-        })
+        .then(r => r.json())
         .then(data => {
+            console.log('Resposta da API:', data);
             let html = '';
-            if (data && data.Search && data.Search.length) {
+            if (data && data.Search && Array.isArray(data.Search) && data.Search.length) {
                 html = data.Search.map(filme => renderImdbResultCard(filme)).join('');
-                imdbModal.classList.add('show');
             } else {
-                html = '<p style="color:#888;text-align:center;">Nenhum filme encontrado com esse título.</p>';
+                html = '<p style="color:#888;text-align:center;">Nenhum filme encontrado.</p>';
             }
             resultsDiv.innerHTML = html;
         })
-        .catch(err => {
-            console.log('Erro ao buscar filmes:', err);
+        .catch((err) => {
+            console.log('Erro na busca:', err);
             resultsDiv.innerHTML = '<p style="color:#d00;text-align:center;">Erro ao buscar filmes. Tente novamente.</p>';
-            imdbModal.classList.add('show');
         });
 }
+// Renderiza cada card de resultado
 function renderImdbResultCard(filme) {
     const img = filme.Poster && filme.Poster !== 'N/A' ? filme.Poster : '';
     return `<div style='display:flex;align-items:center;gap:18px;padding:12px 0;border-bottom:1px solid #e3e7ed;'>` +
@@ -289,6 +331,7 @@ function renderImdbResultCard(filme) {
         `<div style='color:#444;font-size:13px;margin:4px 0 8px 0;'>${filme.Type === 'movie' ? 'Filme' : filme.Type}</div>` +
         `<button onclick='fetchImdbDetailsAndOpenModal(${JSON.stringify(filme.imdbID)})' style='background:#222e3a;color:#fff;padding:7px 16px;border:none;border-radius:5px;font-size:15px;font-weight:500;cursor:pointer;transition:background 0.2s;'>Selecionar</button></div></div>`;
 }
+// Busca detalhes e abre modal de cadastro
 function fetchImdbDetailsAndOpenModal(imdbID) {
     fetch('movies.php?imdb_search=' + encodeURIComponent(imdbID) + '&by_id=1')
         .then(r => r.json())
@@ -300,119 +343,24 @@ function fetchImdbDetailsAndOpenModal(imdbID) {
             if(document.getElementById('movie_elenco')) document.getElementById('movie_elenco').value = data.Actors || '';
             if(document.getElementById('movie_avaliacao')) document.getElementById('movie_avaliacao').value = data.imdbRating || '';
             document.getElementById('movie_ativoNaHome').checked = false;
-            document.getElementById('modalPesquisa').classList.remove('show');
+            closeImdbSearchModal();
             document.getElementById('movieModal').classList.add('show');
         });
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Corrige erro de função não definida e garante robustez
-    window.openCreateMovieModal = function() {
-        // Limpa os campos do modal de filme
-        var id = document.getElementById('movie_id');
-        var titulo = document.getElementById('movie_titulo');
-        var descricao = document.getElementById('movie_descricao');
-        var imagem = document.getElementById('movie_imagem');
-        var elenco = document.getElementById('movie_elenco');
-        var avaliacao = document.getElementById('movie_avaliacao');
-        var ativo = document.getElementById('movie_ativoNaHome');
-        if (id) id.value = '';
-        if (titulo) titulo.value = '';
-        if (descricao) descricao.value = '';
-        if (imagem) imagem.value = '';
-        if (elenco) elenco.value = '';
-        if (avaliacao) avaliacao.value = '';
-        if (ativo) ativo.checked = false;
-        var modal = document.getElementById('movieModal');
-        if (modal) modal.classList.add('show');
+// Garante que o botão de buscar do modal está funcional
+if (document.getElementById('imdbSearchBtn')) {
+    document.getElementById('imdbSearchBtn').onclick = function(e) {
+        e.preventDefault();
+        searchImdbMovie();
     };
-
-    // Corrige erro de null ao adicionar onclick
-    var closeMovieModalBtn = document.getElementById('closeMovieModal');
-    var movieModal = document.getElementById('movieModal');
-    if (closeMovieModalBtn && movieModal) {
-        closeMovieModalBtn.addEventListener('click', function () {
-            movieModal.classList.remove('show');
-        });
-    }
-
-    // Busca de filmes ao clicar no botão 'Buscar' do modal IMDb
-    var imdbSearchBtn = document.querySelector('#imdbSearchForm button[type="button"]');
-    var imdbInput = document.getElementById('imdbQuery');
-    if (imdbSearchBtn && imdbInput) {
-        imdbSearchBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            searchImdbMovie();
-        });
-    }
-
-    // Garante que o modal de busca IMDb fecha corretamente
-    var closeImdbBtn = document.getElementById('closeImdbSearchModal');
-    var imdbModal = document.getElementById('imdbSearchModal');
-    if (closeImdbBtn && imdbModal) {
-        closeImdbBtn.addEventListener('click', function () {
-            imdbModal.classList.remove('show');
-        });
-    }
-
-    // Abrir modal de pesquisa
-    var btnAbrir = document.getElementById('abrirModalPesquisa');
-    var modalPesquisa = document.getElementById('modalPesquisa');
-    var fecharModal = document.getElementById('fecharModalPesquisa');
-    var inputPesquisa = document.getElementById('inputPesquisaFilme');
-    var btnBuscar = document.getElementById('btnBuscarFilme');
-    var resultadosDiv = document.getElementById('resultadosPesquisaFilme');
-    if (btnAbrir && modalPesquisa) {
-        btnAbrir.addEventListener('click', function () {
-            modalPesquisa.classList.add('show');
-            resultadosDiv.innerHTML = '';
-            if(inputPesquisa) inputPesquisa.value = '';
-            if(inputPesquisa) inputPesquisa.focus();
-        });
-    }
-    if (fecharModal && modalPesquisa) {
-        fecharModal.addEventListener('click', function () {
-            modalPesquisa.classList.remove('show');
-        });
-        fecharModal.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                modalPesquisa.classList.remove('show');
-            }
-        });
-    }
-    // Fecha ao clicar fora do conteúdo
-    window.addEventListener('click', function (event) {
-        if (event.target === modalPesquisa) {
-            modalPesquisa.classList.remove('show');
-        }
-    });
-    // Busca de filmes
-    if (btnBuscar && inputPesquisa && resultadosDiv) {
-        btnBuscar.addEventListener('click', function () {
-            const termo = inputPesquisa.value.trim();
-            if (termo.length < 3) {
-                resultadosDiv.innerHTML = '<p style="color:#d00;text-align:center;">Digite pelo menos 3 caracteres.</p>';
-                return;
-            }
-            resultadosDiv.innerHTML = '<div style="color:#007bff;text-align:center;padding:20px;">Carregando...</div>';
-            fetch('movies.php?imdb_search=' + encodeURIComponent(termo))
-                .then(r => r.json())
-                .then(data => {
-                    let html = '';
-                    if (data && data.Search && data.Search.length) {
-                        html = data.Search.map(filme => renderImdbResultCard(filme)).join('');
-                    } else {
-                        html = '<p style="color:#888;text-align:center;">Nenhum filme encontrado com esse título.</p>';
-                    }
-                    resultadosDiv.innerHTML = html;
-                })
-                .catch((err) => {
-                    resultadosDiv.innerHTML = '<p style="color:#d00;text-align:center;">Erro ao buscar filmes. Tente novamente.</p>';
-                    console.log('Erro na busca:', err);
-                });
-        });
-    }
-});
+}
+// Garante que o botão principal "Pesquisar" abre o modal
+if (document.getElementById('pesquisar')) {
+    document.getElementById('pesquisar').onclick = function(e) {
+        e.preventDefault();
+        openImdbSearchModal();
+    };
+}
 </script>
 <footer>
     <p>&copy; 2025 Unifilmes. Todos os direitos reservados.</p>

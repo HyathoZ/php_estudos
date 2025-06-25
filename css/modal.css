@@ -89,3 +89,19 @@
 .close:hover {
     color: #ff4d4d; /* Vermelho */
 }
+
+/* Centraliza horizontalmente os resultados dos filmes no modal de pesquisa */
+#resultadosPesquisaFilme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+/* Mantém responsividade dos cards */
+#resultadosPesquisaFilme > div {
+  width: 100%;
+  max-width: 520px;
+}

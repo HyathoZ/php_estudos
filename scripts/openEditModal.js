@@ -1,4 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Correção do botão 'Pesquisar' para abrir o modal de busca de filmes ---
+    const botaoPesquisar = document.getElementById('botaoPesquisar');
+    const modal = document.getElementById('editModal');
+    if (botaoPesquisar && modal) {
+        botaoPesquisar.addEventListener('click', () => {
+            modal.classList.add('show');
+            modal.style.display = 'block'; // fallback para garantir visibilidade
+            console.log('Modal de busca de filmes aberto.');
+        });
+    } else {
+        if (!botaoPesquisar) console.log('Botão "Pesquisar" não encontrado no DOM.');
+        if (!modal) console.log('Modal de busca de filmes (editModal) não encontrado no DOM.');
+    }
+    // --- Correção do botão de fechar modal ---
+    const closeBtn = document.getElementById('closeModal');
+    if (closeBtn && modal) {
+        closeBtn.onclick = function () {
+            modal.classList.remove('show');
+            modal.style.display = '';
+            console.log('Modal de busca de filmes fechado.');
+        };
+    }
+
     function openEditModal(user) {
         // Preenche os campos do modal com os dados do usuário
         document.getElementById('edit_id').value = user.id;
@@ -120,4 +143,30 @@ document.addEventListener('DOMContentLoaded', function () {
             delModal.classList.remove('show');
         }
     });
+
+    // Corrige abertura do modal de pesquisa de filmes
+    // (Apenas se ambos os elementos existirem e IDs não conflitam com outros modais)
+    const botaoPesquisar = document.getElementById('abrirModalPesquisa');
+    const modalPesquisa = document.getElementById('modalPesquisa');
+    if (botaoPesquisar && modalPesquisa) {
+        botaoPesquisar.addEventListener('click', function () {
+            modalPesquisa.classList.add('show');
+            modalPesquisa.style.display = 'block';
+        });
+        // Fecha o modal ao clicar no X
+        const fecharModalPesquisa = document.getElementById('fecharModalPesquisa');
+        if (fecharModalPesquisa) {
+            fecharModalPesquisa.addEventListener('click', function () {
+                modalPesquisa.classList.remove('show');
+                modalPesquisa.style.display = 'none';
+            });
+        }
+        // Fecha o modal ao clicar fora do conteúdo
+        window.addEventListener('click', function (event) {
+            if (event.target === modalPesquisa) {
+                modalPesquisa.classList.remove('show');
+                modalPesquisa.style.display = 'none';
+            }
+        });
+    }
 });
