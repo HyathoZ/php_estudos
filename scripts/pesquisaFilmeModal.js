@@ -125,18 +125,29 @@ document.addEventListener('DOMContentLoaded', function () {
       filme = JSON.parse(filmeJson);
     } catch (e) {
       console.error('Erro ao decodificar filme selecionado:', e);
+      alert('Erro ao processar dados do filme.');
       return;
     }
-
-    fetch('movies.php?imdb_search=' + encodeURIComponent(filme.imdbID) + '&by_id=1')
+    // Pergunta ao usuário se deseja exibir na home
+    const exibirNaHome = confirm('Deseja exibir este filme na página inicial?');
+    filme.exibirNaHome = exibirNaHome ? 1 : 0;
+    // Envia para o backend
+    fetch('salvar_filme.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(filme)
+    })
       .then(r => r.json())
       .then(data => {
-        // Aqui você pode abrir um segundo modal com os dados detalhados e o toggle switch
-        alert('Filme selecionado: ' + (data.Title || ''));
+        if (data.success) {
+          alert('Filme cadastrado com sucesso!');
+        } else {
+          alert('Erro ao cadastrar filme: ' + (data.message || 'Erro desconhecido.'));
+        }
       })
       .catch(err => {
-        console.error('Erro ao buscar detalhes do filme:', err);
-        alert('Erro ao buscar dados do filme selecionado.');
+        console.error('Erro ao salvar filme:', err);
+        alert('Erro ao salvar filme.');
       });
   };
 });
