@@ -12,7 +12,11 @@ $popularMovies = $tmdb->getPopularMovies();
  
 // Exibe apenas filmes ativos na home
 include('conexao.php');
-$filmesAtivos = $conn->query("SELECT * FROM filmes WHERE ativoNaHome = 1");
+// Busca apenas filmes com exibirNaHome = true
+$stmt = $conn->prepare("SELECT * FROM filmes WHERE exibirNaHome = 1 ORDER BY created_at DESC");
+$stmt->execute();
+$result = $stmt->get_result();
+$filmesAtivos = $result;
 ?>
 
 <!DOCTYPE html>
@@ -59,24 +63,25 @@ $filmesAtivos = $conn->query("SELECT * FROM filmes WHERE ativoNaHome = 1");
         <div class="filmes-grid">
             <?php if ($filmesAtivos && $filmesAtivos->num_rows > 0): ?>
                 <?php while ($filme = $filmesAtivos->fetch_assoc()): ?>
-                    <div class="filme-card">
-                        <?php if ($filme['imagem']): ?>
-                            <img src="<?php echo htmlspecialchars($filme['imagem']); ?>" alt="<?php echo htmlspecialchars($filme['titulo']); ?>" class="filme-poster">
+                    <div class="card" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:10px;overflow:hidden;background:#fff;max-width:320px;margin:0 auto 24px;">
+                        <?php if (!empty($filme['poster'])): ?>
+                            <img src="<?= htmlspecialchars($filme['poster']) ?>" alt="<?= htmlspecialchars($filme['title']) ?>" style="width:100%;height:auto;display:block;object-fit:cover;">
                         <?php endif; ?>
-                        <div class="filme-info">
-                            <h4><?php echo htmlspecialchars($filme['titulo']); ?></h4>
-                            <p><?php echo nl2br(htmlspecialchars($filme['descricao'])); ?></p>
-                            <?php if (!empty($filme['elenco'])): ?>
-                                <p><strong>Elenco:</strong> <?php echo htmlspecialchars($filme['elenco']); ?></p>
-                            <?php endif; ?>
-                            <?php if (!empty($filme['avaliacao'])): ?>
-                                <p><strong>Avaliação:</strong> <?php echo htmlspecialchars($filme['avaliacao']); ?></p>
+                        <div class="card-body" style="padding:16px;">
+                            <h3 style="margin:0 0 8px 0; color:#007bff; font-size:20px;">
+                                <?= htmlspecialchars($filme['title']) ?><?php if (!empty($filme['year'])): ?> (<?= htmlspecialchars($filme['year']) ?>)<?php endif; ?>
+                            </h3>
+                            <p style="margin:0 0 8px 0; color:#333; font-size:15px;">
+                                <?= htmlspecialchars($filme['plot']) ?>
+                            </p>
+                            <?php if (!empty($filme['actors'])): ?>
+                            <small style="color:#555;"><strong>Elenco:</strong> <?= htmlspecialchars($filme['actors']) ?></small>
                             <?php endif; ?>
                         </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p style="grid-column: 1/-1; text-align:center;">Nenhum destaque disponível no momento.</p>
+                <p style="grid-column: 1/-1; text-align:center;">Nenhum filme disponível na home ainda.</p>
             <?php endif; ?>
         </div>
     </section>
