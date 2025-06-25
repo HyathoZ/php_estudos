@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
             onclick='window.selecionarFilmeModal && window.selecionarFilmeModal(decodeURIComponent("${filmeString}"))'
             style="background:#222e3a;color:#fff;padding:7px 16px;border:none;border-radius:5px;font-size:15px;font-weight:500;cursor:pointer;transition:background 0.2s;"
           >
-            Selecionar
+            Cadastrar
           </button>
         </div>
       </div>`;

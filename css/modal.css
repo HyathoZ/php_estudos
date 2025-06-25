@@ -90,6 +90,41 @@
     color: #ff4d4d; /* Vermelho */
 }
 
+/* Centraliza o conteúdo do modal de pesquisa de filmes na tela */
+#modalPesquisa {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* fundo escuro atrás do modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  padding: 0; /* Remove padding extra */
+}
+#modalPesquisa.show {
+  opacity: 1;
+  visibility: visible;
+}
+#modalPesquisa .modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
 /* Centraliza horizontalmente os resultados dos filmes no modal de pesquisa */
 #resultadosPesquisaFilme {
   display: flex;
@@ -100,35 +135,15 @@
   margin: 0 auto;
   box-sizing: border-box;
 }
-/* Mantém responsividade dos cards */
 #resultadosPesquisaFilme > div {
   width: 100%;
   max-width: 520px;
 }
 
-/* Centraliza o modal de busca de filmes na tela de forma elegante e responsiva */
-#modalPesquisa {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1100;
-  display: none; /* Exibido apenas com .show */
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-  max-width: 95vw;
-  width: 100%;
-  max-width: 500px;
-  padding: 0;
-}
-#modalPesquisa.show {
-  display: block;
-}
 @media (max-width: 600px) {
-  #modalPesquisa {
+  #modalPesquisa .modal-content {
     max-width: 98vw;
-    min-width: 0;
-    padding: 0;
+    width: 98vw;
+    padding: 10px;
   }
 }
