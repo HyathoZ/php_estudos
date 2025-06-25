@@ -35,10 +35,14 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.classList.add('show');
     }
 
-    document.getElementById('closeModal').addEventListener('click', function () {
-        const modal = document.getElementById('editModal');
-        modal.classList.remove('show');
-    });
+    // Corrige erro ao tentar atribuir onclick a elemento inexistente
+    var closeModalBtn = document.getElementById('closeModal');
+    var editModal = document.getElementById('editModal');
+    if (closeModalBtn && editModal) {
+        closeModalBtn.onclick = function () {
+            editModal.classList.remove('show');
+        };
+    }
 
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('editModal');

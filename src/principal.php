@@ -9,6 +9,10 @@ if (!isset($_SESSION['cpf'])) {
 
 $tmdb = new TMDB();
 $popularMovies = $tmdb->getPopularMovies();
+
+// Exibe apenas filmes ativos na home
+include('conexao.php');
+$filmesAtivos = $conn->query("SELECT * FROM filmes WHERE ativoNaHome = 1");
 ?>
 
 <!DOCTYPE html>
@@ -51,8 +55,30 @@ $popularMovies = $tmdb->getPopularMovies();
     </aside>
 
     <section class="filmes">
-        <h3>Detalhes do Filme</h3>
-        <p>Selecione um filme para ver mais detalhes.</p>
+        <h3>Filmes em Destaque</h3>
+        <div class="filmes-grid">
+            <?php if ($filmesAtivos && $filmesAtivos->num_rows > 0): ?>
+                <?php while ($filme = $filmesAtivos->fetch_assoc()): ?>
+                    <div class="filme-card">
+                        <?php if ($filme['imagem']): ?>
+                            <img src="<?php echo htmlspecialchars($filme['imagem']); ?>" alt="<?php echo htmlspecialchars($filme['titulo']); ?>" class="filme-poster">
+                        <?php endif; ?>
+                        <div class="filme-info">
+                            <h4><?php echo htmlspecialchars($filme['titulo']); ?></h4>
+                            <p><?php echo nl2br(htmlspecialchars($filme['descricao'])); ?></p>
+                            <?php if (!empty($filme['elenco'])): ?>
+                                <p><strong>Elenco:</strong> <?php echo htmlspecialchars($filme['elenco']); ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($filme['avaliacao'])): ?>
+                                <p><strong>Avaliação:</strong> <?php echo htmlspecialchars($filme['avaliacao']); ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p style="grid-column: 1/-1; text-align:center;">Nenhum destaque disponível no momento.</p>
+            <?php endif; ?>
+        </div>
     </section>
 </main>
 
