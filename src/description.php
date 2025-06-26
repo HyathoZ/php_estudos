@@ -20,14 +20,22 @@ $movie = $tmdb->getMovieDetails($movieId);
 // Buscar vídeos (trailers)
 $videos = $tmdb->getMovieVideos($movieId);
 $trailer = null;
-if (isset($videos['results'])) {
+if (isset($videos['results']) && is_array($videos['results'])) {
     foreach ($videos['results'] as $video) {
-        if ($video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
+        if (isset($video['type'], $video['site']) && $video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
             $trailer = $video['key'];
             break;
         }
     }
 }
+// Função utilitária para pegar valor seguro
+function getSafeValue($arr, $key, $default = 'Não disponível') {
+    return isset($arr[$key]) && $arr[$key] !== null && $arr[$key] !== '' ? htmlspecialchars($arr[$key]) : $default;
+}
+// Gêneros seguro
+$generos = (isset($movie['genres']) && is_array($movie['genres']) && count($movie['genres']) > 0)
+    ? implode(', ', array_map(fn($g) => htmlspecialchars($g['name']), $movie['genres']))
+    : 'Gêneros não informados';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -35,7 +43,7 @@ if (isset($videos['results'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/style.css">
-    <title><?php echo htmlspecialchars($movie['title'] ?? 'Filme'); ?> - Detalhes</title>
+    <title><?= getSafeValue($movie, 'title', 'Filme') ?> - Detalhes</title>
     <style>
         .descricao-filme-container {
             display: flex;
@@ -83,7 +91,7 @@ if (isset($videos['results'])) {
 <body>
 <header>
     <div class="container-header">
-        <h2>Bem-vindo, <?php echo $_SESSION["nome"]; ?>!</h2>
+        <h2>Bem-vindo, <?= htmlspecialchars($_SESSION["nome"] ?? '') ?>!</h2>
         <div class="sair">
             <div class="config">
                 <img src="../icones/config.svg" alt="Configurações" class="config-icon" id="config-icon">
@@ -114,28 +122,28 @@ if (isset($videos['results'])) {
     <div class="descricao-filme-container">
         <div class="descricao-poster">
             <?php if (!empty($movie['poster_path'])): ?>
-                <img src="https://image.tmdb.org/t/p/w500<?php echo $movie['poster_path']; ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>">
+                <img src="https://image.tmdb.org/t/p/w500<?= htmlspecialchars($movie['poster_path']) ?>" alt="<?= getSafeValue($movie, 'title') ?>">
             <?php else: ?>
                 <div class="filme-sem-poster">Sem imagem</div>
             <?php endif; ?>
         </div>
         <div class="descricao-info">
-            <h1><?php echo htmlspecialchars($movie['title']); ?></h1>
-            <p><strong>Título original:</strong> <?php echo htmlspecialchars($movie['original_title']); ?></p>
-            <p><strong>Lançamento:</strong> <?php echo $movie['release_date']; ?></p>
-            <p><strong>Duração:</strong> <?php echo $movie['runtime']; ?> min</p>
-            <p><strong>Nota:</strong> <?php echo $movie['vote_average']; ?>/10 (<?php echo $movie['vote_count']; ?> votos)</p>
-            <p><strong>Gêneros:</strong> <?php echo implode(', ', array_map(function($g){return $g['name'];}, $movie['genres'])); ?></p>
-            <p><strong>Sinopse:</strong> <?php echo htmlspecialchars($movie['overview']); ?></p>
+            <h1><?= getSafeValue($movie, 'title') ?></h1>
+            <p><strong>Título original:</strong> <?= getSafeValue($movie, 'original_title') ?></p>
+            <p><strong>Lançamento:</strong> <?= getSafeValue($movie, 'release_date') ?></p>
+            <p><strong>Duração:</strong> <?= getSafeValue($movie, 'runtime', 'Não informado') ?> min</p>
+            <p><strong>Nota:</strong> <?= getSafeValue($movie, 'vote_average', 'N/A') ?>/10 (<?= getSafeValue($movie, 'vote_count', '0') ?> votos)</p>
+            <p><strong>Gêneros:</strong> <?= $generos ?></p>
+            <p><strong>Sinopse:</strong> <?= getSafeValue($movie, 'overview') ?></p>
             <?php if (!empty($movie['homepage'])): ?>
-                <p><a href="<?php echo $movie['homepage']; ?>" target="_blank">Site oficial</a></p>
+                <p><a href="<?= htmlspecialchars($movie['homepage']) ?>" target="_blank">Site oficial</a></p>
             <?php endif; ?>
         </div>
     </div>
     <?php if ($trailer): ?>
     <div class="descricao-trailer" style="text-align:center;">
         <h2>Trailer</h2>
-        <iframe src="https://www.youtube.com/embed/<?php echo $trailer; ?>" frameborder="0" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/<?= htmlspecialchars($trailer) ?>" frameborder="0" allowfullscreen></iframe>
     </div>
     <?php endif; ?>
     <div style="text-align:center; margin: 32px;">

@@ -63,22 +63,24 @@ $filmesAtivos = $result;
         <div class="filmes-grid">
             <?php if ($filmesAtivos && $filmesAtivos->num_rows > 0): ?>
                 <?php while ($filme = $filmesAtivos->fetch_assoc()): ?>
-                    <div class="card" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:10px;overflow:hidden;background:#fff;max-width:320px;margin:0 auto 24px;">
-                        <?php if (!empty($filme['poster'])): ?>
-                            <img src="<?= htmlspecialchars($filme['poster']) ?>" alt="<?= htmlspecialchars($filme['title']) ?>" style="width:100%;height:auto;display:block;object-fit:cover;">
-                        <?php endif; ?>
-                        <div class="card-body" style="padding:16px;">
-                            <h3 style="margin:0 0 8px 0; color:#007bff; font-size:20px;">
-                                <?= htmlspecialchars($filme['title']) ?><?php if (!empty($filme['year'])): ?> (<?= htmlspecialchars($filme['year']) ?>)<?php endif; ?>
-                            </h3>
-                            <p style="margin:0 0 8px 0; color:#333; font-size:15px;">
-                                <?= htmlspecialchars($filme['plot']) ?>
-                            </p>
-                            <?php if (!empty($filme['actors'])): ?>
-                            <small style="color:#555;"><strong>Elenco:</strong> <?= htmlspecialchars($filme['actors']) ?></small>
+                    <a href="description.php?id=<?= urlencode($filme['imdbID']) ?>" class="card-link">
+                        <div class="card" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:10px;overflow:hidden;background:#fff;max-width:320px;margin:0 auto 24px;">
+                            <?php if (!empty($filme['poster'])): ?>
+                                <img src="<?= htmlspecialchars($filme['poster']) ?>" alt="<?= htmlspecialchars($filme['title']) ?>" style="width:100%;height:auto;display:block;object-fit:cover;">
                             <?php endif; ?>
+                            <div class="card-body" style="padding:16px;">
+                                <h3 style="margin:0 0 8px 0; color:#007bff; font-size:20px;">
+                                    <?= htmlspecialchars($filme['title']) ?><?php if (!empty($filme['year'])): ?> (<?= htmlspecialchars($filme['year']) ?>)<?php endif; ?>
+                                </h3>
+                                <p style="margin:0 0 8px 0; color:#333; font-size:15px;">
+                                    <?= htmlspecialchars($filme['plot']) ?>
+                                </p>
+                                <?php if (!empty($filme['actors'])): ?>
+                                <small style="color:#555;"><strong>Elenco:</strong> <?= htmlspecialchars($filme['actors']) ?></small>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 <?php endwhile; ?>
             <?php else: ?>
                 <p style="grid-column: 1/-1; text-align:center;">Nenhum filme disponível na home ainda.</p>

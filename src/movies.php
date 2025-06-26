@@ -186,7 +186,7 @@ if (isset($_GET['imdb_search'])) {
                     <th>Descrição</th>
                     <th>Elenco</th>
                     <th>Avaliação</th>
-                    <th>Ativo na Home</th>
+                    <th>Ativo</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -203,7 +203,6 @@ if (isset($_GET['imdb_search'])) {
                             <input type="checkbox" class="toggle-switch" data-id="<?= htmlspecialchars($filme['imdbID']) ?>" <?= $filme['exibirNaHome'] ? 'checked' : '' ?> onchange="atualizarExibirNaHome(this)">
                             <span class="slider"></span>
                         </label>
-                        <span style="margin-left:8px;">Ativo na Home</span>
                     </td>
                     <td>
                         <button class="btn-edit" onclick='openEditMovieModal(<?= json_encode($filme) ?>)'>Editar</button>
